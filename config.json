@@ -1,0 +1,6 @@
+{ 
+  "token"  : "[your token]",
+  "prefix" : "!i",
+  "greetings": ["hi!", "hello!", "hey!","hi", "hello", "hey"],
+  "ownerID": "[your userID]"
+}
