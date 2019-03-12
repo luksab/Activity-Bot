@@ -1,3 +1,4 @@
+const WebSocket = require('ws');
 const Discord = require("discord.js");
 const config = require("./config.json");
 const client = new Discord.Client();
@@ -7,7 +8,10 @@ var activityChannels = [];
 var timeOffset = 0;
 var activityChannelsNames = []
 
-var fs = require('fs');
+var wsClient = null;
+
+
+const fs = require('fs');
 var data = fs.readFileSync('data.json', 'utf8');
 if (data) {
   data = JSON.parse(data);
@@ -112,18 +116,53 @@ client.on("message", async message => {
   }
 
   if (message.content.indexOf(config.prefix) !== 0) { if(message.guild !== null) guildsWithLastTimestamp[message.channel.guild.id] = message.createdTimestamp; return; }
-
+  
   const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
 
   if (command === "help") {
-    message.channel.send("Hello, my name is Activity Bot and I am responsible for keeping this server active... or at least making everyone conscious about how inactive it really is.");
-    message.channel.send("My prefix is ${config.prefix}. So you can call me with ${config.prefix} [command].");
-    message.channel.send("The available commands are:");
-    message.channel.send("time: Tells you (and all the others on this server that are even looking at it) how long ago the last message that wasn't a bot or a bot-command was send.");
-    message.channel.send("send: Will write a message every 6 hours, about how badly inactive this server has gotten.");
+    message.channel.send("Hello, my name is Activity Bot and I am responsible for keeping this server active... or at least making everyone conscious about how inactive it really is."+'\n'+
+    `My prefix is ${config.prefix}. So you can call me with ${config.prefix} [command].`+'\n'+
+    "The available commands are:"+'\n'+
+    "time: Tells you (and all the others on this server that are even looking at it) how long ago the last message that wasn't a bot or a bot-command was send."+'\n'+
+    "send: Will write a message every 6 hours, about how badly inactive this server has gotten."+'\n'+
+    "pic: Will generate spirit waifu based on your Discord username and send it where you asked for it.");
+    return;
   }
-
+  if (command === "pic"){
+    var name = message.author.username;
+    if(args.length >= 1){
+        name = message.content.slice(config.prefix.length).trim().split(/ +/g).slice(1).join(' ');
+    }
+    name = name.replace('[|/]','');
+    try {
+        if (fs.existsSync(`avatars/${name}.jpg`)) {
+            message.channel.send("Here you go:",{file:`avatars/${name}.jpg`});
+            return;
+        }
+    } catch(err) {
+        console.error(err)
+    }
+    if(wsClient.readyState == 1){
+        console.log(name+' requested an anime waifu.');
+        wsClient.send(name);
+        avatarChannel = message.channel;
+        message.channel.send("please wait...");
+    }
+    else{
+        message.channel.send(`Im sorry, but the Avatarmaker is not available.😖`+'\n'+
+        `Mabe try again later?😅`);
+        message.channel.send("-Currently training another AI on the PC😛");
+        console.loog("WS is off.");
+    }
+    return;
+  }
+  
+  if (command === "link" || command === "invite") {
+    message.reply("The invite link for me is: "+config.inviteLink);
+    return;
+  }
+  
   if (command === "save") {
     if (message.author.id === config.ownerID) {
       message.reply("saving...");
@@ -151,12 +190,14 @@ client.on("message", async message => {
   }
 
   if (message.guild === null) {//If DM
-    message.channel.send("I cant DM, sorry.");
-    return message.reply(`But in a server you can call me with ${config.prefix} [command]`)
+    message.channel.send("I cant DM, sorry."+'\n'+
+    `But in a server you can call me with ${config.prefix} [command]`);
+    return;
   }
 
   if (command === "time") {
     sendUptime(guildsWithLastTimestamp[message.channel.guild.id], message.channel)
+    return;
   }
 
   if (command === "send") {
@@ -170,14 +211,15 @@ client.on("message", async message => {
       return false;
     }
     if (containsObject(message.channel, activityChannels)) {
-      console.log("rem")
+      console.log("removed "+message.channel.id+" to the activityChannels.");
       message.channel.send("Ill not send any more notifications here.");
       activityChannels = activityChannels.filter(function (value, index, arr) { return value !== message.channel; });
       return;
     }
-    console.log("add")
-    activityChannels[0] = message.channel;
-    activityChannels[0].send("Ill send a notification here every 6 hours.");
+    console.log("added "+message.channel.id+" to the activityChannels.");
+    activityChannels.push(message.channel);
+    activityChannels[activityChannels.length-1].send("Ill send a notification here every 6 hours.");
+    return;
   }
 });
 
@@ -223,3 +265,44 @@ const clean = text => {
 
 
 client.login(config.token);
+
+
+
+
+
+var avatarChannel;
+
+
+process.on('uncaughtException', function (err) {
+    start('ws://192.168.2.252:8766/');
+}); 
+
+function start(websocketServerLocation){
+    wsClient = null;
+    try{wsClient = new WebSocket(websocketServerLocation);}
+    catch(e){setTimeout(function(){start(websocketServerLocation)}, 5000);}
+    wsClient.onmessage = function(msg) { 
+        data = msg.data
+        data = data.split('|');
+        data[1] = data[1].substring(2, data[1].length-1)
+        fs.writeFileSync(`avatars/${data[0]}.jpg`,data[1],{encoding: 'base64'},err=>console.log(err));
+        avatarChannel.send("Here you go:",{file:`avatars/${data[0]}.jpg`});
+        };
+    wsClient.onclose = function(){
+        // Try to reconnect in 5 seconds
+        setTimeout(function(){start(websocketServerLocation)}, 5000);
+    };
+    wsClient.onopen = function(){console.log('Ws open');};
+}
+
+start(config.webSocketIP);
+
+
+
+
+
+
+
+
+
+
