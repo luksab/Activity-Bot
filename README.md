@@ -2,7 +2,7 @@
 A DiscordBot to show activity of a server
 
 <p align="center">
-  <img src="figures/example.jpg">
+  <img src="example.png">
 </p>
 
 ## Setup
