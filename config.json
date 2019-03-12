@@ -2,5 +2,7 @@
   "token"  : "[your token]",
   "prefix" : "!i",
   "greetings": ["hi!", "hello!", "hey!","hi", "hello", "hey"],
-  "ownerID": "[your userID]"
+  "ownerID": "[your userID]",
+  "inviteLink": "https://discordapp.com/api/oauth2/authorize?client_id=552477696328990721&permissions=75776&scope=bot",
+  "webSocketIP": "ws://192.168.2.252:8766/"
 }
