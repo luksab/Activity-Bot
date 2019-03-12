@@ -1,9 +1,7 @@
 # Activity-Bot
 A DiscordBot to show activity of a server
 
-<p align="center">
-  <img src="example.png">
-</p>
+<img src="example.png" width="300">
 
 ## Setup
 ### Node.js
