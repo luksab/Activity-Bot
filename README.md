@@ -10,5 +10,5 @@ A DiscordBot to show activity of a server
 * Run index.js with node.js
 
 ### Python
-* Make sure you can run styleGAN
+* Make sure you can run [styleGAN](https://github.com/NVlabs/stylegan)
 * Run ImgFromWebSocket.py in the styleGAN directory
