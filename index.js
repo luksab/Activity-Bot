@@ -12,7 +12,13 @@ var wsClient = null;
 
 
 const fs = require('fs');
-var data = fs.readFileSync('data.json', 'utf8');
+var data;
+try {
+  data = fs.readFileSync('data.json', 'utf8');
+} catch (error) {
+  data = '{"g":{},"a":[],"t":0}';
+}
+
 if (data) {
   data = JSON.parse(data);
   guildsWithLastTimestamp = data.g;
@@ -269,7 +275,6 @@ client.login(config.token);
 
 
 
-
 var avatarChannel;
 
 
@@ -295,7 +300,7 @@ function start(websocketServerLocation){
     wsClient.onopen = function(){console.log('Ws open');};
 }
 
-start(config.webSocketIP);
+//start(config.webSocketIP);
 
 
 
