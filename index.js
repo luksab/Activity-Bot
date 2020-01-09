@@ -314,13 +314,12 @@ function optifineCheck() {
   rp("https://www.reddit.com/r/Optifine/comments/d8nptg/optifine_115_progress_report/?sort=new")
       .then(function(html){
         //success!
-        const optifineNew = html.match(/OptiFine 1.15.[1-9] is [0-9]{2,3}% done./, i)[0];
-
+        const start = html.indexOf("OptiFine 1.15.1 is ");
         if(optifine === "")
-          optifine = optifineNew;
-        if(optifine === optifineNew)
+          optifine = html.slice(start,start+28);
+        if(optifine === html.slice(start,start+28))
           return;
-        optifine = optifineNew;
+        optifine = html.slice(start,start+28);
         for(let channel in optifineChannels){
           channel.send(optifine);
         }
