@@ -333,9 +333,7 @@ function optifineCheck() {
 
 var token;
 try {
-  token = fs.readFileSync("./token").toString();
-  console.log("read token file");
-  console.log(token);
+  token = fs.readFileSync("./token").toString().trim();
 } catch (error) {}
 
 if(config.token !== "[your token]")
