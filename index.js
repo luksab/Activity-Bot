@@ -320,8 +320,10 @@ function optifineCheck() {
       });
 }
 
-client.login(config.token);
-
+if(config.token !== "[your token]")
+  client.login(config.token);
+else
+  client.login(process.env.token);//read from env
 
 
 
