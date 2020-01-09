@@ -1,10 +1,13 @@
 const WebSocket = require('ws');
+const rp = require('request-promise');
+const $ = require('cheerio');
 const Discord = require("discord.js");
 const config = require("./config.json");
 const client = new Discord.Client();
 
 var guildsWithLastTimestamp = {};
 var activityChannels = [];
+var optifineChannels = [];
 var timeOffset = 0;
 var activityChannelsNames = []
 
@@ -16,13 +19,14 @@ var data;
 try {
   data = fs.readFileSync('data.json', 'utf8');
 } catch (error) {
-  data = '{"g":{},"a":[],"t":0}';
+  data = '{"g":{},"a":[],"t":0,"o":0}';
 }
 
 if (data) {
   data = JSON.parse(data);
   guildsWithLastTimestamp = data.g;
   activityChannelsNames = data.a;
+  optifineChannelsNames = data.o;
   timeOffset = data.t;
 }
 
@@ -38,6 +42,9 @@ client.on("ready", () => {
 
   for (var i = 0; i < activityChannelsNames.length; i++) {
     activityChannels[i] = client.channels.get(activityChannelsNames[i]);
+  }
+  for (var i = 0; i < optifineChannels.length; i++) {
+    optifineChannels[i] = client.channels.get(optifineChannelsNames[i]);
   }
   console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
   console.log(`I am ` + client.user.username + `.`);
@@ -207,15 +214,6 @@ client.on("message", async message => {
   }
 
   if (command === "send") {
-    function containsObject(obj, list) {
-      var i;
-      for (i = 0; i < list.length; i++) {
-        if (list[i].id === obj.id) {
-          return true;
-        }
-      }
-      return false;
-    }
     if (containsObject(message.channel, activityChannels)) {
       console.log("removed "+message.channel.id+" to the activityChannels.");
       message.channel.send("Ill not send any more notifications here.");
@@ -225,6 +223,31 @@ client.on("message", async message => {
     console.log("added "+message.channel.id+" to the activityChannels.");
     activityChannels.push(message.channel);
     activityChannels[activityChannels.length-1].send("Ill send a notification here every 6 hours.");
+    return;
+  }
+
+  if (command === "optifine") {
+    rp("https://www.reddit.com/r/Optifine/comments/d8nptg/optifine_115_progress_report/?sort=new")
+      .then(function(html){
+        //success!
+        const start = html.indexOf("OptiFine 1.15.1 is ");
+        message.channel.send(html.slice(start,start+28));
+        console.log(html.slice(start,start+28));
+      })
+      .catch(function(err){
+        //handle error
+    });
+  }
+  if (command === "sendOptifine") {
+    if (containsObject(message.channel, optifineChannels)) {
+      console.log("removed "+message.channel.id+" to the optifineChannels.");
+      message.channel.send("Ill not send any more notifications here.");
+      optifineChannels = optifineChannels.filter(function (value, index, arr) { return value !== message.channel; });
+      return;
+    }
+    console.log("added "+message.channel.id+" to the optifineChannels.");
+    optifineChannels.push(message.channel);
+    optifineChannels[optifineChannels.length-1].send("Ill send a notification here once the state changes.");
     return;
   }
 });
@@ -253,13 +276,18 @@ function save() {
   for (var i = 0; i < activityChannels.length; i++) {
     activityChannelsNames.push(activityChannels[i].id);
   }
-  data = { g: guildsWithLastTimestamp, a: activityChannelsNames, t: timeOffset };
+  var optifineChannelsNames = [];
+  for (var i = 0; i < optifineChannels.length; i++) {
+    optifineChannelsNames.push(optifineChannels[i].id);
+  }
+  data = { g: guildsWithLastTimestamp, a: activityChannelsNames, t: timeOffset, o: optifineChannelsNames};
   console.log(data)
   fs.writeFile('data.json', JSON.stringify(data), 'utf8', err => { });
 }
 
 var saving = setInterval(function () {
   save();
+  optifineCheck();
 }, 1800 * 1000);//save every 30 minutes
 
 const clean = text => {
@@ -269,6 +297,26 @@ const clean = text => {
       return text;
 }
 
+let optifine = "";
+function optifineCheck() {
+  rp("https://www.reddit.com/r/Optifine/comments/d8nptg/optifine_115_progress_report/?sort=new")
+      .then(function(html){
+        //success!
+        const start = html.indexOf("OptiFine 1.15.1 is ");
+        if(optifine === "")
+          optifine = html.slice(start,start+28);
+        if(optifine === html.slice(start,start+28))
+          return;
+        optifine = html.slice(start,start+28);
+        for(let channel in optifineChannels){
+          channel.send(optifine);
+        }
+        console.log(optifine);
+      })
+      .catch(function(err){
+        //handle error
+      });
+}
 
 client.login(config.token);
 
@@ -280,7 +328,17 @@ var avatarChannel;
 
 process.on('uncaughtException', function (err) {
     start('ws://192.168.2.252:8766/');
-}); 
+});
+
+function containsObject(obj, list) {
+  var i;
+  for (i = 0; i < list.length; i++) {
+    if (list[i].id === obj.id) {
+      return true;
+    }
+  }
+  return false;
+}
 
 function start(websocketServerLocation){
     wsClient = null;
