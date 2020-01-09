@@ -213,6 +213,7 @@ client.on("message", async message => {
       .catch(function(err){
         //handle error
     });
+    return;
   }
 
   if (message.guild === null) {//If DM
@@ -229,26 +230,26 @@ client.on("message", async message => {
   if (command === "send") {
     if (containsObject(message.channel, activityChannels)) {
       console.log("removed "+message.channel.id+" to the activityChannels.");
-      message.channel.send("Ill not send any more notifications here.");
+      message.channel.send("I'll not send any more notifications here.");
       activityChannels = activityChannels.filter(function (value, index, arr) { return value !== message.channel; });
       return;
     }
     console.log("added "+message.channel.id+" to the activityChannels.");
     activityChannels.push(message.channel);
-    activityChannels[activityChannels.length-1].send("Ill send a notification here every 6 hours.");
+    activityChannels[activityChannels.length-1].send("I'll send a notification here every 6 hours.");
     return;
   }
 
-  if (command === "sendOptifine") {
+  if (command === "sendoptifine") {
     if (containsObject(message.channel, optifineChannels)) {
       console.log("removed "+message.channel.id+" to the optifineChannels.");
-      message.channel.send("Ill not send any more notifications here.");
+      message.channel.send("I'll not send any more notifications here.");
       optifineChannels = optifineChannels.filter(function (value, index, arr) { return value !== message.channel; });
       return;
     }
     console.log("added "+message.channel.id+" to the optifineChannels.");
     optifineChannels.push(message.channel);
-    optifineChannels[optifineChannels.length-1].send("Ill send a notification here once the state changes.");
+    optifineChannels[optifineChannels.length-1].send("I'll send a notification here once the state changes.");
     return;
   }
 });
