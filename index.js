@@ -330,8 +330,15 @@ function optifineCheck() {
       });
 }
 
+var token;
+try {
+  token = fs.readFileSync("./token");
+} catch (error) {}
+
 if(config.token !== "[your token]")
   client.login(config.token);
+else if(token != null)
+  client.login(token);
 else
   client.login(process.env.token);//read from env
 
