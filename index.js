@@ -213,12 +213,15 @@ client.on("message", async message => {
   }
 
   if (command === "optifine") {
+    if(optifine !== "")
+      return message.channel.send(optifine);
     rp("https://www.reddit.com/r/Optifine/comments/d8nptg/optifine_115_progress_report/?sort=new")
       .then(function(html){
         //success!
         const start = html.indexOf("OptiFine 1.15.1 is ");
         message.channel.send(html.slice(start,start+28));
-        console.log(html.slice(start,start+28));
+        if(optifine === "")
+          optifine = html.slice(start,start+28);
       })
       .catch(function(err){
         //handle error
