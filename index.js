@@ -202,6 +202,19 @@ client.on("message", async message => {
     }
   }
 
+  if (command === "optifine") {
+    rp("https://www.reddit.com/r/Optifine/comments/d8nptg/optifine_115_progress_report/?sort=new")
+      .then(function(html){
+        //success!
+        const start = html.indexOf("OptiFine 1.15.1 is ");
+        message.channel.send(html.slice(start,start+28));
+        console.log(html.slice(start,start+28));
+      })
+      .catch(function(err){
+        //handle error
+    });
+  }
+
   if (message.guild === null) {//If DM
     message.channel.send("I cant DM, sorry."+'\n'+
     `But in a server you can call me with ${config.prefix} [command]`);
@@ -226,18 +239,6 @@ client.on("message", async message => {
     return;
   }
 
-  if (command === "optifine") {
-    rp("https://www.reddit.com/r/Optifine/comments/d8nptg/optifine_115_progress_report/?sort=new")
-      .then(function(html){
-        //success!
-        const start = html.indexOf("OptiFine 1.15.1 is ");
-        message.channel.send(html.slice(start,start+28));
-        console.log(html.slice(start,start+28));
-      })
-      .catch(function(err){
-        //handle error
-    });
-  }
   if (command === "sendOptifine") {
     if (containsObject(message.channel, optifineChannels)) {
       console.log("removed "+message.channel.id+" to the optifineChannels.");
