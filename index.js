@@ -128,7 +128,7 @@ client.on("guildDelete", guild => {
 });
 
 client.on("message", async message => {
-  console.info("new Message:",message.author.username,":",message.content);
+  console.log("new Message:",message.author.username,":",message.content);
   timeOffset = Date.now() - message.createdTimestamp;
   //console.log(message.channel.guild.id);
 
