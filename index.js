@@ -339,6 +339,9 @@ try {
   token = fs.readFileSync("./token").toString().trim();
 } catch (error) {}
 
+client.on("disconnect",(ev)=>console.error("disconnected:",ev))
+client.on("reconnecting",(ev)=>console.log("reconnecting:",ev))
+
 if(config.token !== "[your token]")
   client.login(config.token);
 else if(token != null)
@@ -352,6 +355,7 @@ var avatarChannel;
 
 
 process.on('uncaughtException', function (err) {
+    console.error("uncaughtException:",err);
     start('ws://192.168.2.252:8766/');
 });
 
