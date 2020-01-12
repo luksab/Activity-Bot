@@ -230,6 +230,20 @@ client.on("message", async message => {
     return;
   }
 
+  if (command === "uptime") {
+    const duration = client.uptime;
+    var milliseconds = parseInt((duration % 1000) / 100),
+      seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+  
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+    
+    message.channel.send("I have been online for "+hours + ":" + minutes + ":" + seconds + "." + milliseconds)
+  }
+
   if (message.guild === null) {//If DM
     message.channel.send("I cant DM, sorry."+'\n'+
     `But in a server you can call me with ${config.prefix} [command]`);
