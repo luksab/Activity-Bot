@@ -53,7 +53,7 @@ client.on("ready", () => {
   for (var i = 0; i < activityChannelsNames.length; i++) {
     activityChannels[i] = client.channels.get(activityChannelsNames[i]);
   }
-  for (var i = 0; i < optifineChannels.length; i++) {
+  for (var i = 0; i < optifineChannelsNames.length; i++) {
     optifineChannels[i] = client.channels.get(optifineChannelsNames[i]);
   }
   console.log(`Bot has started, with ${client.users.size} users, in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
