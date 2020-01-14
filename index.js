@@ -246,6 +246,7 @@ client.on("message", async message => {
 
   if (command === "man" || command === "tldr") {
     if(args[0] == null) return message.channel.send("plz 2nd argument");
+    if(!(/^[a-z0-9]+$/i.test(args[0]))) return message.channel.send("plz no special characters");
     let cmd = "tldr " + args[0];
     let callb = function (error,stdout,stderr) {
       //console.log("stdout:",stdout);
