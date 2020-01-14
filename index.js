@@ -67,7 +67,7 @@ client.on("ready", () => {
       messages.array().forEach(message => {
         if (!(message.bot) && (message.content.indexOf(config.prefix) === 0)){
           guildsWithLastTimestamp[message.channel.guild.id] = message.createdTimestamp;
-          console.log("found Message with timestamp "+message.createdTimestamp+" in guild"+message.channel.guild.id);
+          console.log("found Message with timestamp "+message.createdTimestamp+" in guild "+message.channel.guild.id);
         }
       });
       return true;
