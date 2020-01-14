@@ -7,7 +7,7 @@ express()
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 
-
+var exec = require('child_process').exec;
 const WebSocket = require('ws');
 const rp = require('request-promise');
 const $ = require('cheerio');
@@ -241,7 +241,19 @@ client.on("message", async message => {
     minutes = (minutes < 10) ? "0" + minutes : minutes;
     seconds = (seconds < 10) ? "0" + seconds : seconds;
     
-    message.channel.send("I have been online for "+hours + ":" + minutes + ":" + seconds + "." + milliseconds)
+    return message.channel.send("I have been online for "+hours + ":" + minutes + ":" + seconds + "." + milliseconds)
+  }
+
+  if (command === "man" || command === "tldr") {
+    if(args[0] == null) return message.channel.send("plz 2nd argument");
+    let cmd = "tldr " + args[0];
+    let callb = function (error,stdout,stderr) {
+      //console.log("stdout:",stdout);
+      //console.log("stderr:",stderr);
+      if(stdout !== "")
+        this.message.channel.send("```"+stdout+"```");
+    }.bind({message:message});
+    return exec(cmd,callb);
   }
 
   if (message.guild === null) {//If DM
