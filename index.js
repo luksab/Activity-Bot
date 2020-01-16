@@ -240,8 +240,9 @@ client.on("message", async message => {
     hours = (hours < 10) ? "0" + hours : hours;
     minutes = (minutes < 10) ? "0" + minutes : minutes;
     seconds = (seconds < 10) ? "0" + seconds : seconds;
+    let days = Math.floor(duration/(1000 * 60 * 60 * 24));
     
-    return message.channel.send("I have been online for "+hours + ":" + minutes + ":" + seconds + "." + milliseconds)
+    return message.channel.send("I have been online for "+days+":"+hours + ":" + minutes + ":" + seconds + "." + milliseconds)
   }
 
   if (command === "man" || command === "tldr") {
